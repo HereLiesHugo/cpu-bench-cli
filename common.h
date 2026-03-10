@@ -46,7 +46,7 @@ typedef struct {
 typedef struct {
     struct timespec start;
     struct timespec end;
-} timer_t;
+} bench_timer_t;
 
 /* Result structure for a single workload run */
 typedef struct {
