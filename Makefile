@@ -17,7 +17,7 @@ ifeq ($(UNAME_S),Darwin)
     LDFLAGS += -framework CoreFoundation 2>/dev/null || true
 else ifeq ($(UNAME_S),Linux)
     # Linux
-    CFLAGS += -DPLATFORM_LINUX=1 -DPLATFORM_MACOS=0 -DPLATFORM_WINDOWS=0
+    CFLAGS += -DPLATFORM_LINUX=1 -DPLATFORM_MACOS=0 -DPLATFORM_WINDOWS=0 -D_GNU_SOURCE
 else ifneq ($(findstring MINGW,$(UNAME_S)),)
     # Windows (MinGW)
     CFLAGS += -DPLATFORM_WINDOWS=1 -DPLATFORM_LINUX=0 -DPLATFORM_MACOS=0
