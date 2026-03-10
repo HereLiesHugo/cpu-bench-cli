@@ -8,6 +8,9 @@
 /* Formula: (single_core_time / (multi_core_time * num_threads)) * 100 */
 double calculate_efficiency(double single_time, double multi_time, int num_threads);
 
+/* Calculate overall benchmark score (higher is better) */
+double calculate_overall_score(const benchmark_results_t *results);
+
 /* Output formatting functions */
 void print_text_results(const benchmark_results_t *results);
 void print_json_results(const benchmark_results_t *results);

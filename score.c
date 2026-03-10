@@ -11,6 +11,42 @@ double calculate_efficiency(double single_time, double multi_time, int num_threa
     return (single_time / (multi_time * num_threads)) * 100.0;
 }
 
+/* Calculate overall benchmark score (higher is better) */
+/* Uses reference times to normalize - score of 1000 = reference performance */
+/* Single-core reference: Prime Sieve = 60ms, Matrix = 600ms */
+double calculate_overall_score(const benchmark_results_t *results) {
+    const double REF_SIEVE_SINGLE = 60.0;   /* Reference single-core time */
+    const double REF_MATRIX_SINGLE = 600.0; /* Reference single-core time */
+    
+    double score = 0.0;
+    int count = 0;
+    
+    /* Single-core scores (weighted 60%) */
+    if (results->single_sieve.elapsed_ms > 0) {
+        score += (REF_SIEVE_SINGLE / results->single_sieve.elapsed_ms) * 1000.0 * 0.3;
+        count++;
+    }
+    if (results->single_matrix.elapsed_ms > 0) {
+        score += (REF_MATRIX_SINGLE / results->single_matrix.elapsed_ms) * 1000.0 * 0.3;
+        count++;
+    }
+    
+    /* Multi-core scores (weighted 40%) */
+    if (results->threads_used > 0) {
+        if (results->multi_sieve.elapsed_ms > 0) {
+            /* Score based on throughput: threads * (reference / time) */
+            double throughput = results->threads_used * (REF_SIEVE_SINGLE / results->multi_sieve.elapsed_ms);
+            score += throughput * 1000.0 * 0.2;
+        }
+        if (results->multi_matrix.elapsed_ms > 0) {
+            double throughput = results->threads_used * (REF_MATRIX_SINGLE / results->multi_matrix.elapsed_ms);
+            score += throughput * 1000.0 * 0.2;
+        }
+    }
+    
+    return score;
+}
+
 /* Get workload name string */
 const char *workload_name(workload_type_t type) {
     return (type == WORKLOAD_SIEVE) ? "Prime Sieve" : "Matrix Multiply";
@@ -67,6 +103,13 @@ void print_text_results(const benchmark_results_t *results) {
         printf("\n");
     }
     
+    /* Overall Score */
+    double overall_score = calculate_overall_score(results);
+    printf("╔══════════════════════════════════════════════════════════════╗\n");
+    printf("║  OVERALL SCORE: %8.0f                                     ║\n", overall_score);
+    printf("╚══════════════════════════════════════════════════════════════╝\n");
+    printf("\n");
+    
     /* Health warnings */
     if (results->thermal_warning) {
         printf("⚠ WARNING: Temperature increased by %d°C during benchmark.\n", results->temp_delta);
@@ -110,6 +153,10 @@ void print_json_results(const benchmark_results_t *results) {
     printf("  \"efficiency\": {\n");
     printf("    \"prime_sieve_pct\": %.2f,\n", sieve_eff);
     printf("    \"matrix_multiply_pct\": %.2f\n", matrix_eff);
+    printf("  },\n");
+    
+    printf("  \"score\": {\n");
+    printf("    \"overall\": %.2f\n", calculate_overall_score(results));
     printf("  },\n");
     
     printf("  \"warnings\": {\n");

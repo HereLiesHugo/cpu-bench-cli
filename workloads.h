@@ -1,3 +1,8 @@
+/* Required for pthread_barrier_t on Linux with -std=c11 */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
 #ifndef WORKLOADS_H
 #define WORKLOADS_H
 

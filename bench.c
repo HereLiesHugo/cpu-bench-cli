@@ -48,7 +48,7 @@ bool pin_thread_to_cpu(int cpu_id) {
 
 /* Run a single iteration of workload and return elapsed time */
 static double run_workload_iteration(workload_type_t workload, bool verbose, int iteration_num) {
-    timer_t timer;
+    bench_timer_t timer;
     
     TIMER_START(timer);
     
@@ -153,7 +153,7 @@ void *benchmark_thread_worker(void *arg) {
     pthread_barrier_wait(data->barrier);
     
     /* Run timed iterations */
-    timer_t timer;
+    bench_timer_t timer;
     TIMER_START(timer);
     
     for (int i = 0; i < NUM_ITERATIONS; i++) {
